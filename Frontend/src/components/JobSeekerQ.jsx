@@ -367,18 +367,11 @@
 // }
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import WeSkillNavbar from './MainNavbar';
-import { useAuth } from '../AuthContext';
 
-export default function JobSeekerRegistration() {
-  const { user } = useAuth();
-  const userId = localStorage.getItem('userId');
-  const name = localStorage.getItem('name');
-  const navigate = useNavigate();
-
+const ProfileForm = () => {
   const [formData, setFormData] = useState({
+    fullName: '',
     studentId: '',
     college: '',
     yearOfStudy: '',
@@ -392,119 +385,125 @@ export default function JobSeekerRegistration() {
     languages: '',
     linkedIn: '',
     portfolio: '',
-    resume: null
   });
 
+  const [resumeFile, setResumeFile] = useState(null);
+
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'resume') {
-      setFormData({ ...formData, resume: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    setResumeFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = new FormData();
-    for (const key in formData) {
-      form.append(key, formData[key]);
+
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    const data = new FormData();
+    data.append('userId', userId);
+    Object.entries(formData).forEach(([key, value]) => {
+      data.append(key, value);
+    });
+    if (resumeFile) {
+      data.append('resume', resumeFile);
     }
-    form.append('userId', userId);
-    form.append('fullName', name);
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.post('https://localhost:5001/api/profiles/createProfile', form, {
+      const response = await axios.post('http://localhost:5000/api/profile/create', data, {
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
-        }
+        },
       });
-      navigate('/job-seeker');
+
+      alert('Profile created successfully!');
+      console.log(response.data);
     } catch (error) {
       console.error(error);
-      alert('Registration failed!');
+      alert('Error creating profile');
     }
   };
 
   return (
-    <div>
-      <WeSkillNavbar />
-      <div className="container mt-5">
-        <div className="card p-4">
-          <h2 className="text-center mb-4">Registration</h2>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label">Student ID Number</label>
-              <input type="text" className="form-control" name="studentId" value={formData.studentId} onChange={handleChange} required />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">College/University Name</label>
-              <input type="text" className="form-control" name="college" value={formData.college} onChange={handleChange} required />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Current Year of Study</label>
-              <input type="text" className="form-control" name="yearOfStudy" value={formData.yearOfStudy} onChange={handleChange} required />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Major/Field of Study</label>
-              <input type="text" className="form-control" name="major" value={formData.major} onChange={handleChange} required />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Minor (if applicable)</label>
-              <input type="text" className="form-control" name="minor" value={formData.minor} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Expected Graduation Date</label>
-              <input type="date" className="form-control" name="graduationDate" value={formData.graduationDate} onChange={handleChange} required />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Cumulative GPA</label>
-              <input type="text" className="form-control" name="gpa" value={formData.gpa} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Technical Skills</label>
-              <input type="text" className="form-control" name="technicalSkills" value={formData.technicalSkills} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Soft Skills</label>
-              <input type="text" className="form-control" name="softSkills" value={formData.softSkills} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Certifications (Name of Certification and Issuing Organization)</label>
-              <textarea className="form-control" name="certifications" value={formData.certifications} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Languages Known and Proficiency Level</label>
-              <textarea className="form-control" name="languages" value={formData.languages} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">LinkedIn Profile URL</label>
-              <input type="url" className="form-control" name="linkedIn" value={formData.linkedIn} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Personal Portfolio or Website URL</label>
-              <input type="url" className="form-control" name="portfolio" value={formData.portfolio} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Resume/CV</label>
-              <input type="file" className="form-control" name="resume" onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-            
-                <textarea
-                  className="form-control mt-2"
-                  name="bio"
-                  
-                  onChange={handleChange}
-                  placeholder="Tell us bio your work"
-                ></textarea>
-                </div>
-            <button type="submit" className="btn btn-primary w-100">Submit</button>
-          </form>
+    <div className="container mt-5">
+      <h3 className="mb-4">Create Profile</h3>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className="form-control" placeholder="Full Name" required />
+          </div>
+          <div className="col-md-6">
+            <input type="text" name="studentId" value={formData.studentId} onChange={handleChange} className="form-control" placeholder="Student ID" />
+          </div>
         </div>
-      </div>
+
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <input type="text" name="college" value={formData.college} onChange={handleChange} className="form-control" placeholder="College" />
+          </div>
+          <div className="col-md-6">
+            <input type="text" name="yearOfStudy" value={formData.yearOfStudy} onChange={handleChange} className="form-control" placeholder="Year of Study" />
+          </div>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <input type="text" name="major" value={formData.major} onChange={handleChange} className="form-control" placeholder="Major" />
+          </div>
+          <div className="col-md-6">
+            <input type="text" name="minor" value={formData.minor} onChange={handleChange} className="form-control" placeholder="Minor" />
+          </div>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <input type="date" name="graduationDate" value={formData.graduationDate} onChange={handleChange} className="form-control" />
+          </div>
+          <div className="col-md-6">
+            <input type="text" name="gpa" value={formData.gpa} onChange={handleChange} className="form-control" placeholder="GPA" />
+          </div>
+        </div>
+
+        <div className="mb-3">
+          <textarea name="technicalSkills" value={formData.technicalSkills} onChange={handleChange} className="form-control" placeholder="Technical Skills (comma-separated)"></textarea>
+        </div>
+
+        <div className="mb-3">
+          <textarea name="softSkills" value={formData.softSkills} onChange={handleChange} className="form-control" placeholder="Soft Skills (comma-separated)"></textarea>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <input type="text" name="certifications" value={formData.certifications} onChange={handleChange} className="form-control" placeholder="Certifications" />
+          </div>
+          <div className="col-md-6">
+            <input type="text" name="languages" value={formData.languages} onChange={handleChange} className="form-control" placeholder="Languages Known" />
+          </div>
+        </div>
+
+        <div className="row mb-3">
+          <div className="col-md-6">
+            <input type="url" name="linkedIn" value={formData.linkedIn} onChange={handleChange} className="form-control" placeholder="LinkedIn URL" />
+          </div>
+          <div className="col-md-6">
+            <input type="url" name="portfolio" value={formData.portfolio} onChange={handleChange} className="form-control" placeholder="Portfolio URL" />
+          </div>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Upload Resume (PDF)</label>
+          <input type="file" accept=".pdf" onChange={handleFileChange} className="form-control" />
+        </div>
+
+        <button type="submit" className="btn btn-primary w-100">Create Profile</button>
+      </form>
     </div>
   );
-}
+};
+
+export default ProfileForm;
