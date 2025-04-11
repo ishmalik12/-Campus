@@ -491,6 +491,16 @@ export default function JobSeekerRegistration() {
               <label className="form-label">Resume/CV</label>
               <input type="file" className="form-control" name="resume" onChange={handleChange} />
             </div>
+            <div className="mb-3">
+            
+                <textarea
+                  className="form-control mt-2"
+                  name="bio"
+                  
+                  onChange={handleChange}
+                  placeholder="Tell us bio your work"
+                ></textarea>
+                </div>
             <button type="submit" className="btn btn-primary w-100">Submit</button>
           </form>
         </div>

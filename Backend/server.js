@@ -17,7 +17,7 @@ connectDB();
 // Use CORS middleware
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Allow requests from your frontend URL
+    origin: 'http://localhost:5174', // Allow requests from your frontend URL
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
     credentials: true, // If using cookies or auth headers
   })
