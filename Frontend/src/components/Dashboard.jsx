@@ -203,10 +203,11 @@ const Dashboard = () => {
   const filteredFields = workFields.filter(field =>
     field.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  const filters = {};
   const handleCardClick = (field) => {
-    navigate('/aiquestions', { state: { selectedField: field.name } });
+    navigate('/profiles', { state: { selectedField : field.name ,filters, skipFilters: true } });
   };
+
 
   return (
     <>

@@ -14,52 +14,55 @@ export default function RegisterPage() {
     email: '',
     password: '',
     city: '',
-    country: '',
-    role: 'provider', 
+    collegeName: '',
+    course: '',
+    section: '',
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  console.log(formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     try {
-      const response = await fetch('https://weskill.onrender.com/api/auth/signup', {
+      // Send POST request to backend API
+      const response = await fetch('http://localhost:5001/api/auth/signup', {  // Ensure correct URL
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
-      const data = await response.json();
-      if (response.ok) {
-        console.log("register response:", data); // Log the entire response data
-        
-        const { token } = data; // Extract the token from the parsed data
   
-        if (token) {
-          localStorage.setItem('token', token);
-          localStorage.setItem('userId', data.user._id);
-          localStorage.setItem('name', data.user.name);
-          console.log("Token stored in localStorage:", token);
-          if (data.profileId) {
-            localStorage.setItem('profileId', data.profileId); 
-            
+      // Check if the response is OK
+      if (response.ok) {
+        const data = await response.json();
+        const { token, user } = data;
+  
+        // Save user data and token to localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('userId', user._id);
+        localStorage.setItem('name', user.name);
+        if (data.profileId) {
+          localStorage.setItem('profileId', data.profileId);
         }
-        } else {
-          console.error("No token received in response.");
-        }
-        navigate('/welcomemsg')
+  
+        // Navigate to welcome message page
+        navigate('/welcomemsg');
       } else {
-        setError(data.message || 'An unknown error ocurred'); // Error from the server
+        // If the response is not OK, show the error message
+        const data = await response.json();
+        setError(data.message || 'An unknown error occurred');
       }
     } catch (error) {
-      console.error('Error:', error.message);
+      console.error('Error:', error);
       alert('Server error. Please try again later.');
     }
   };
-
+  
   return (
     <div style={{ backgroundColor: 'whitesmoke' }}>
       <Navbar />
@@ -155,34 +158,54 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div className="col-sm-6 col-12">
-                  <label className="form-label">Country</label>
+                  <label className="form-label">College Name</label>
                   <input
                     type="text"
                     className="form-control"
-                    name="country"
-                    value={formData.country}
+                    name="collegeName"
+                    value={formData.college}
                     onChange={handleChange}
                     required
                   />
                 </div>
                 <div className="col-sm-6 col-12">
-                  <label className="form-label">Role</label>
-                  <select
-                    className="form-select"
-                    name="role"
-                    value={formData.role}
+                  <label className="form-label">Course</label>
+                  <input
+                    list="courseList"
+                    className="form-control"
+                    name="course"
+                    value={formData.course}
                     onChange={handleChange}
-                  >
-                    <option value="provider">Provider</option>
-                    <option value="seeker">Seeker</option>
-                  </select>
+                    required
+                  />
+                  <datalist id="courseList">
+                    <option value="B.Tech" />
+                    <option value="BBA" />
+                    <option value="LLB" />
+                    <option value="B.Sc" />
+                    <option value="BA" />
+                    <option value="MBA" />
+                    <option value="M.Tech" />
+                  </datalist>
+                </div>
+                <div className="col-sm-6 col-12">
+                  <label className="form-label">Section</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="section"
+                    value={formData.section}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
-            </div>
-            <div className="text-center">
-              <button type="submit" className="btn m-3 btn-success">
-                Submit
-              </button>
+
+              {error && <p className="text-danger mt-3">{error}</p>}
+
+              <div className="text-center mt-4">
+                <button type="submit" className="btn btn-primary px-5">Register</button>
+              </div>
             </div>
           </form>
         </div>

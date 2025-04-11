@@ -61,7 +61,7 @@ const handleLogout = () => {
                 boxShadow: '0 0 8px #28a745'
               }}
             >
-             Job Seeker
+             Your Profile
             </Button>
 
             <NavDropdown title="Profile" id="basic-nav-dropdown" className="ms-3">

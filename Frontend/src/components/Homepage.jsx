@@ -72,7 +72,7 @@ export default function Homepage() {
 
   return (
     <div className="App">
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+      <nav className="navbar navbar-expand-lg  bg-dark sticky-top" style={{backgroundColor:"#1e1e1e", color:"white"}}>
         <div className="container-fluid">
           <a className="navbar-brand" href="#">
             <img src={weskill} style={{ maxHeight: '3rem' }} alt="@Campus Logo" />
@@ -90,9 +90,9 @@ export default function Homepage() {
           </button>
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav">
-              <a className={`nav-link ${activeSection === '#home' ? 'active' : ''}`} href="#home">Home</a>
-              <a className={`nav-link ${activeSection === '#features' ? 'active' : ''}`} href="#features">Features</a>
-              <a className={`nav-link ${activeSection === '#about-us' ? 'active' : ''}`} href="#about-us">About Us</a>
+              <a className={`nav-link ${activeSection === '#home' ? 'active' : ''}`} href="#home" style={{color:"white"}}>Home</a>
+              <a  style={{color:"white"}} className={`nav-link ${activeSection === '#features' ? 'active' : ''}`} href="#features">Features</a>
+              <a  style={{color:"white"}} className={`nav-link ${activeSection === '#about-us' ? 'active' : ''}`} href="#about-us">About Us</a>
             </div>
             <div className="ms-auto d-flex">
               <Link to="/registerpage" className="btn btn-light mx-2">Join Now</Link>

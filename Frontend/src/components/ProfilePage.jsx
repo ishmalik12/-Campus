@@ -10,42 +10,56 @@ const ProfileList = () => {
 
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Extract state safely
-  const { selectedField, answers, skipFilters } = location.state || {};
-  console.log(selectedField);
+
+  // Sample profiles of college students offering tutoring services
+  const sampleProfiles = [
+    {
+      _id: "1",
+      userId: "student1",
+      fullName: "Love Maggo",
+      bio: "Experienced in Math and Physics tutoring for college students. Passionate about helping others succeed.",
+      typeOfWork: "Math and Physics Tutoring",
+      rating: 4,
+      preferredWorkLocation: "Online",
+      badges: ["Expert in Algebra", "Top Rated Tutor"],
+    },
+    {
+      _id: "2",
+      userId: "student2",
+      fullName: "Dakshyani Murari",
+      bio: "Friendly and patient tutor specializing in Chemistry and Biology. Let me help you ace your exams!",
+      typeOfWork: "Chemistry and Biology Tutoring",
+      rating: 5,
+      preferredWorkLocation: "In-person at College Campus",
+      badges: ["Expert in Organic Chemistry", "Highly Recommended"],
+    },
+    {
+      _id: "3",
+      userId: "student3",
+      fullName: "Ish Malik",
+      bio: "I offer tutoring in Programming (Python, Java) and Data Science. Let's solve problems together.",
+      typeOfWork: "Programming and Data Science Tutoring",
+      rating: 4,
+      preferredWorkLocation: "Online",
+      badges: ["Data Science Enthusiast", "Python Expert"],
+    },
+    {
+      _id: "4",
+      userId: "student4",
+      fullName: "Kanishka Sharma",
+      bio: "English tutor for college students. I specialize in writing, grammar, and exam preparation.",
+      typeOfWork: "English Language Tutoring",
+      rating: 4.5,
+      preferredWorkLocation: "Online or In-person",
+      badges: ["Grammar Master", "Exam Prep Specialist"],
+    },
+  ];
+
   const fetchProfiles = async () => {
     try {
       setLoading(true);
-      console.log("Answers received:", answers);
-      
-      const categoryValue = typeof selectedField === "string" ? selectedField : selectedField?.selectedField || "Web Development";
-      console.log(categoryValue);
-      
-      let filters = {};
-      if (!skipFilters && answers) {
-        filters = {
-          badges: answers["Job seeker traits"] ? [answers["Job seeker traits"]] : [],
-          technologyStack: answers["Technology Preference"]
-            ? answers["Technology Preference"].split(", ")
-            : [],
-          preferredWorkType: answers["What type of website do you need?"] || null,
-        };
-
-        Object.keys(filters).forEach((key) => {
-          if (!filters[key] || (Array.isArray(filters[key]) && filters[key].length === 0)) {
-            delete filters[key];
-          }
-        });
-      }
-
-      const requestBody = skipFilters ? { category: categoryValue } : { category: categoryValue, filters };
-      console.log("Filters sent to API:", requestBody);
-      
-      const response = await axios.post("https://weskill.onrender.com/api/profiles/filter", requestBody);
-      console.log("Fetched profiles:", response.data);
-      
-      setProfiles(response.data || []);
+      // In a real scenario, replace the following line with an API call
+      setProfiles(sampleProfiles);
     } catch (error) {
       console.error("Error fetching profiles:", error);
       setProfiles([]);
@@ -59,9 +73,9 @@ const ProfileList = () => {
   }, []);
 
   const handleProfileClick = (profile) => {
-    navigate('/profile-details', { state: { profileId: profile._id , userId: profile.userId} });
+    navigate('/profile-details', { state: { profileId: profile._id, userId: profile.userId } });
   };
-  
+
   const renderRatingStars = (rating) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -80,8 +94,8 @@ const ProfileList = () => {
     <>
       <WeSkillNavbar />
       <div className="container my-5">
-        <h2 className="mb-4">{selectedField?.name || "Profiles you need"}</h2>
-        <p>{selectedField?.description || "Explore some sample profiles to get started."}</p>
+        <h2 className="mb-4">College Tutor Profiles</h2>
+        <p>Explore some sample profiles of college students offering tutoring assistance.</p>
 
         {loading ? (
           <p className="text-center">Loading profiles...</p>
@@ -110,7 +124,7 @@ const ProfileList = () => {
                       <span className="me-2">Rating:</span>
                       {renderRatingStars(profile.rating || 0)}
                     </div>
-                    <button  className="btn btn-outline-success">Available</button>
+                    <button className="btn btn-outline-success">Available</button>
                     <p className="text-muted mb-2">Preferred Work Location: {profile.preferredWorkLocation || "N/A"}</p>
                     <div className="d-flex flex-wrap">
                       <FaTags className="text-secondary me-2" size={18} />
