@@ -23,7 +23,18 @@ const profileSchema = new mongoose.Schema({
   languages: String,
   linkedIn: String,
   portfolio: String,
-  resume: String, // File path
+  resume: String,
+  bio: String,
+  badges: {
+    type: [String], 
+    required: false,
+    default: [],
+  },
+  works: {
+    type: [String], 
+    required: false,
+    default: [],
+  },
   orders: [
     {
       orderId: {

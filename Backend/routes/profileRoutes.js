@@ -24,5 +24,5 @@ router.post(
   upload.single('profilePhoto'),
   profileController.createProfile
 );
-
+router.get('/getProfile', authMiddleware, profileController.getProfile);
 module.exports = router;

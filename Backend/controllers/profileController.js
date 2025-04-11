@@ -17,7 +17,10 @@ export const createProfile = async (req, res) => {
       certifications,
       languages,
       linkedIn,
-      portfolio
+      bio,
+      portfolio,
+      works,
+      badges
     } = req.body;
 
     const resume = req.file ? req.file.filename : null;
@@ -38,7 +41,10 @@ export const createProfile = async (req, res) => {
       languages,
       linkedIn,
       portfolio,
-      resume
+      bio,
+      resume,
+      works,
+      badges
     });
 
     await profile.save();
@@ -46,5 +52,20 @@ export const createProfile = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error while creating profile' });
+  }
+};
+export const getProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const profile = await Profile.findOne({ userId });
+
+    if (!profile) {
+      return res.status(404).json({ message: 'Profile not found' });
+    }
+
+    res.status(200).json(profile);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
   }
 };

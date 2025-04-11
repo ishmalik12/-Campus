@@ -1,194 +1,117 @@
-import React, { useState, useEffect } from "react";
-import { ListGroup, Container, Row, Col, Card, Button, Spinner, Alert } from "react-bootstrap";
-import WeSkillNavbar from "./MainNavbar";
-import PostedWork from "./Postedwork"; 
-import pp from "./photos/pp.jpg";
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import postwork from '../components/photos/postwork.jpg'
+import WeSkillNavbar from './MainNavbar';
 
-const JobSeekerDashboard = () => {
-  const [toast, setToast] = useState(null);
+export default function ProfileDashboard() {
   const [profile, setProfile] = useState(null);
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProfileAndWorks = async () => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem('token');
+
       try {
-        const token = localStorage.getItem('token');
-        const profileResponse = await axios.get('https://localhost:5001/api/profiles/my-profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await axios.get('http://localhost:5001/api/profiles/getProfile', {
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (profileResponse.data.success) {
-          const userProfile = profileResponse.data.profile;
-          setProfile(userProfile);
-
-          // Fetch works based on profile ID
-          const worksResponse = await axios.get(`https://localhost:5001/api/works/${userProfile._id}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (worksResponse.data && worksResponse.data.length > 0) {
-            setTasks(worksResponse.data);
-          }
-          else{
-            setTasks("");
-          }
-        } else {
-          setError('Profile not found');
-        }
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load data');
-      } finally {
-        setLoading(false);
+        setProfile(response.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
       }
     };
 
-    fetchProfileAndWorks();
+    fetchProfile();
   }, []);
 
-  const showToast = (type, message) => {
-    setToast({ type, message });
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-        <Spinner animation="border" variant="primary" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Container className="my-5">
-        <Alert variant="danger">{error}</Alert>
-        
-      </Container>
-    );
-  }
+  if (!profile) return <div className="text-center mt-5">Loading profile...</div>;
 
   return (
     <>
       <WeSkillNavbar />
-      <Container fluid className="mt-4">
-        {toast && (
-          <Alert variant={toast.type} className="position-fixed top-0 end-0 m-3">
-            {toast.message}
-          </Alert>
-        )}
+      <div className="container mt-5">
+        <div className="card shadow-lg border-0 p-4">
+          <h2 className="text-center mb-4 text-primary fw-bold">Your Profile</h2>
+          <div className="row">
+            <div className="col-md-6 border-end">
+              <div className="mb-3">
+                <strong>Full Name:</strong>
+                <div className="text-muted">{profile.fullName}</div>
+              </div>
+              <div className="mb-3">
+                <strong>Student ID:</strong>
+                <div className="text-muted">{profile.studentId}</div>
+              </div>
+              <div className="mb-3">
+                <strong>College:</strong>
+                <div className="text-muted">{profile.college}</div>
+              </div>
+              <div className="mb-3">
+                <strong>Year of Study:</strong>
+                <div className="badge bg-secondary">{profile.yearOfStudy}</div>
+              </div>
+              <div className="mb-3">
+                <strong>Major:</strong>
+                <div className="text-muted">{profile.major}</div>
+              </div>
+              <div className="mb-3">
+                <strong>Minor:</strong>
+                <div className="text-muted">{profile.minor || '-'}</div>
+              </div>
+              <div className="mb-3">
+                <strong>Graduation Date:</strong>
+                <div className="text-muted">{new Date(profile.graduationDate).toLocaleDateString()}</div>
+              </div>
+              <div className="mb-3">
+                <strong>GPA:</strong>
+                <div className="text-muted">{profile.gpa}</div>
+              </div>
+            </div>
 
-        <Row>
-          {/* Profile Section */}
-          <Col md={12} className="mb-4">
-            <Card>
-              <Card.Body className="d-flex">
-                <div className="me-3">
-                  <img
-                    src={profile.profilePhoto || pp}
-                    alt="Profile"
-                    className="img-fluid rounded-circle"
-                    style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                  />
-                </div>
+            <div className="col-md-6">
+              <div className="mb-3">
+                <strong>Technical Skills:</strong>
+                <div className="text-muted">{profile.technicalSkills}</div>
+              </div>
+              <div className="mb-3">
+                <strong>Soft Skills:</strong>
+                <div className="text-muted">{profile.softSkills}</div>
+              </div>
+              <div className="mb-3">
+                <strong>Certifications:</strong>
+                <div className="text-muted">{profile.certifications}</div>
+              </div>
+              <div className="mb-3">
+                <strong>Languages:</strong>
+                <div className="text-muted">{profile.languages}</div>
+              </div>
+              <div className="mb-3">
+                <strong>LinkedIn:</strong>
+                <div><a className="btn btn-outline-primary btn-sm" href={profile.linkedIn} target="_blank" rel="noreferrer">Visit Profile</a></div>
+              </div>
+              <div className="mb-3">
+                <strong>Portfolio:</strong>
+                <div><a className="btn btn-outline-success btn-sm" href={profile.portfolio} target="_blank" rel="noreferrer">View Portfolio</a></div>
+              </div>
+              <div className="mb-3">
+                <strong>Bio:</strong>
+                <div className="text-muted">{profile.bio}</div>
+              </div>
+              <div className="mb-3">
+                <strong>Resume:</strong>
+                <div><a className="btn btn-outline-dark btn-sm" href={`https://localhost:5001/uploads/${profile.resume}`} target="_blank" rel="noreferrer">Download Resume</a></div>
+              </div>
+              <div className="mb-3">
+  <h5>Open to Work</h5>
+  <ul>
+    {profile.works?.map((work, index) => (
+      <li key={index}>{work}</li>
+    ))}
+  </ul>
+</div>
 
-                <div className="flex-grow-1">
-                  <Card.Title>{profile.fullName}</Card.Title>
-                  <Card.Subtitle className="mb-2 text-muted">
-                    {profile.additionalSkills?.join(' | ')}
-                  </Card.Subtitle>
-                  <hr />
-                  <Card.Text>{profile.bio || 'No bio available'}</Card.Text>
-                  <div className="mt-4">
-                    <h5 className="mb-3">Badges</h5>
-                    <div className="d-flex flex-wrap">
-                      {profile.badges && profile.badges.length > 0 ? (
-                        profile.badges.map((badge, index) => (
-                          <span
-                            key={index}
-                            className="badgeUI badgeUI-gold m-2"
-                            style={{ padding: "10px", borderRadius: "8px" }}
-                          >
-                            {badge}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-muted">No badges earned yet</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="d-flex justify-content-start mt-4">
-                    <Button variant="primary" className="me-2" onClick={() => navigate('/edit-profile')}>
-                      Edit Profile
-                    </Button>
-                    <Button variant="success">
-                      <Link to="/jobseekerorderspage" style={{ textDecoration: "none", color: "white" }}>
-                        View Dashboard
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          {/* Add Post Work Section */}
-          <Col md={12}>
-            <Card className="mb-4">
-              <Card.Body className="d-flex justify-content-between align-items-center">
-                <h5 className="m-0">Add New Work</h5>
-                <Button variant="success">
-                  <Link to="/postwork" style={{ textDecoration: "none", color: "white" }}>
-                    Post Work
-                  </Link>
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          {/* Posted Works Section */}
-          <Col md={12} className="mb-4">
-            <Card>
-              <Card.Header as="h5">Posted Works</Card.Header>
-              <Card.Body>
-                <Row>
-                  {tasks.length > 0 ? (
-                    tasks.map((task, index) => (
-                      <PostedWork
-                        key={index}
-                        title={task.title}
-                        description={task.description}
-                        basic={task.basic}
-                        standard={task.standard}
-                        premium={task.premium}
-                        skills={task.skills}
-                        image={postwork}
-                      />
-                    ))
-                  ) : (
-                    <p style={{ textAlign: "center" }}>Not posted yet</p>
-                  )}
-                </Row>
-                <Button variant="outline-info" className="mt-2 w-100">
-                  See More
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
-};
-
-export default JobSeekerDashboard;
+}
